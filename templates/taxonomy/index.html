@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+
+
+    <title>{{ page_tile }}</title>
+    <h1>{{ page_title }}</h1>
+    <body>
+        <table id="tax_tbl">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </body>
+
+     <script>
+        let taxonomy_json = JSON.parse('{{ dict_of_taxonomies | escapejs }}')
+        var tbdy = document.getElementById('tax_tbl').getElementsByTagName('tbody')[0]
+
+        const len = Object.keys(taxonomy_json).length
+        const all_ids = Object.keys(taxonomy_json)
+        for (var i  = 0; i < len; i++) {
+            var pid = all_ids[i]
+            var new_row = tbdy.insertRow(-1)
+            new_row.innerHTML = "<td>" + pid + "</td><td>" + taxonomy_json[pid] + "</td>"
+        }
+    </script>
+
+</html>
