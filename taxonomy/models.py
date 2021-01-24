@@ -11,7 +11,11 @@ class Taxonomy(models.Model):
     product_description = models.CharField(max_length=200, null=False)
 
     def __str__(self):
-        return f"<Product ID: {self.taxonomy_id} , Parent Id: {self.parent_id}, Product Description: {self.product_description}>"
+        if self.parent_id is None:
+            return f"<Product ID: {self.taxonomy_id} , Parent: None, Product Description: {self.product_description}>"
+        else:
+            return f"<Product ID: {self.taxonomy_id} , Parent: {self.parent_id.product_description}, " \
+                   f"Product Description: {self.product_description}>"
 
     @classmethod
     def load_taxonomy_to_model(cls):
