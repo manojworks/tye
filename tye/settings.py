@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'taxonomy.apps.TaxonomyConfig'
+    'taxonomy.apps.TaxonomyConfig',
+    'expenses.apps.ExpensesConfig',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +82,7 @@ DATABASES = {
         'NAME': 'tyedev',
         'USER': 'tyedev',
         'PASSWORD': 'tyedev',
-        'HOST': '192.168.0.26',
+        'HOST': '192.168.0.27',
         'PORT': '5432',
     }
 }
