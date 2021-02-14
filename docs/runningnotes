@@ -1,0 +1,148 @@
+2020
+
+12/24
+1. Set up Django project in PyCharm with an application named 'base'
+2. Set up git integration using VCS from PyCharm menu. Her eyou would have specified the github remote repo name.
+3. Go to terminal
+git status
+git init - reinitializes the repo
+git add - add what you want to add. I skipped .idea/ and venv/ and .git/ Not sure if I should have skipped .git/
+We will see to this later
+So I have added base/ ; manage.py ; tye/ ; templates/
+git status - on branch master
+git commit -m "base code" - commits the initial base code
+git remote add origin git@github.com:manojworks/tye.git - sets the origin as the repo
+git branch -M main - switch to new branch named main
+git push -u origin main - make main as the origin ; this asks for passphrase
+git status - in branch main
+Added README.md in github repo
+git pull origin main - to pull from repo ; detected update to README.md ; asked for passphrase again
+4. I dont know how to prevent asking for passphrase repeatedly - ManShaYaBhi@4
+
+12/25
+1. Added Google's product taxonomy data csv file to project under /data
+This will be used as baseline codes to lookup products that users buy.
+2. Make a separate branch to develop model for Google's taxonomy data
+git branch model_taxonomy_data
+git checkout model_taxonomy_data
+3. Add the file using git add and then commit using git commit. Then
+git push origin model_taxonomy_data - push the branch changes to remote
+
+12/29
+1. Had trouble with csv.reader while reading csv entries like
+6252,Animals & Pet Supplies,Pet Supplies,"Pet Bowls, Feeders & Waterers",,,,
+This is because I had incorrectly used quotechar="""
+
+12/230
+1. When I created a Django project ub PyCharm, it asked me if I want to create an app. An app is a web application
+that does something. A project can have multiple apps and an app can be part of multiple projects. In our case
+I have decided to create an app called base. But now I am thinking, it should be called taxonomy.
+2. I ran python manage.py startapp taxonomy
+to create a new app called taxonomy
+
+1/1
+1. Setting up PostgresQL DB on Centos 7
+sudo yum install postgresql11-server
+then init the db
+sudo /usr/pgsql-11/bin/postgresql-11-setup initdb
+service postgresql-11.service restart
+enable servuce?
+The installation procedure created a user account called postgres that is associated with the default Postgres role. In order to use Postgres, you can log in to that account.
+To log into this default role
+sudo -i -u postgres
+You can use psql to log into psql console and \q to quit
+To create a new postgresql user
+sudo -u postgres createuser --interactive
+add user user role - tye-dev
+An assumption that the Postgres authentication system makes by default is that for any role used to log in, that role will have a database with the same name which it can access.
+sudo -u tyedev createdb tyedev
+add this user to Centos
+sudo adduser tyedev
+also passwd tyedev to set password as tyedev
+Also add user to wheel group
+On psql prompt
+grant all privileges on database tye-dev to tye-dev
+Another way of logging into psq is
+sudo -u tyedev psql tyedev
+\l to list all databases
+2. Setting up PostgresQL driver in settings.py
+pip install psycopg2-binary to install driver
+
+1/2
+1. pg_hba.conf (/var/lib/pgsql/11/data/pg_hba.conf) did not have an entry for the server (which is my Macbook) that connunicates with the db
+Added the entry with trust priviliges
+2. \du on psql shows the priviliges for the users. Wanted to make sure that tydev has createdb priviliges
+3. Setting timezone is done as America/Regina
+
+1/4
+1. Make a model for Taxonomy with self referencing (restricted) foreign key
+2. When the tables are generated using migrations, DEFERRABLE INITIALLY DEFERRED for foreign key tells not to enforce foreign key until the end of transaction
+3. Remember the three-step guide to making model changes:
+• Change your models (in models.py).
+• Run python manage.py makemigrations to create migrations for those changes
+• Run python manage.py migrate to apply those changes to the database.
+4. Commit migrations to source control
+
+1/6
+1. Finally managed to complete the import of Taxonomy csv into Taxonomy model.
+2. The self referencing foreign key referred to the object (parent_id pointing to taxonomy object not just the id).
+3. Created superuser for admin: python manage.py createsuperuser username admin paswd admin email admin@example.com
+
+1/11
+1. The __str__ method of Taxonomy model class was recreating all child objects for the foreign key reference which took forever. Changed this to only return parent product description.
+2. Created 4 probable urls for the Taxonomy views. List all (index) is pretty straightforward. Need to polish the UI.
+3. Got index.html in taxonomy to work that dumps all 5k+ taxonomy_id, description pairs in a table.
+Had to change the view to return a json and this was interpreted in javascript code that created all the rows.
+Will defer creating proper HTML UI when learn about it.
+
+1/18
+1. Created other taxonomy views and created a simple product details page.
+2. The view returns list to UI but this needs to be transformed into same json structure as what index requires for list all
+3. Could not figure out how to filter results when using get_object_or_404 or get_list_or_404
+4. Implemented all taxonomy views with raw html
+5. Also need to know how to raise 404 custom exceptions
+6. Need to check in code and merge to main
+7. As next step make an entry form for new purchase where user can select a product from the list and enter amount spent on a date
+
+1/23
+1. Checked in all changes to branch model_taxonomy_data
+2. Merged model_taxonomy_data to main. Deleted branch - git branch -d model_taxonomy_data
+3. git push origin to push changes to remote
+4. Created a new app python manage.py startapp expenses - This will be used to manage daily expenses
+
+2/6
+1. The Centos IP address had changed again. So I set the hostname permanently.
+2. hostname -f to get FQDN hostname. Then hostnamectl set-hostname mylinuxbox to set the hostname to mylinuxbox
+3. To make this permanent reboot - systemctl reboot
+4. This did not make the IP address static. Will check that later.
+5. got branch -a to see all local and remote branches
+6. Created a new branch using git checkout -b expenses-base
+7. Make a model for expense which is represented by default id, product id (what you bought), date (mm-dd-yyyy) and the price ( 2 decimals)
+8. How do you make your web pages accessible - Is it Percievable, Operable, Understandable, Robust - wave.webaim.org
+9. Test your web page on https://html5test.com/ and http://html5accessibility.com/
+
+2/7
+1. Run python manage.py makemigrations to create migrations for expenses
+2. Run python manage.py migrate to apply those changes to the database.
+3. Had added 'expenses.apps.ExpensesConfig' to Installed apps in settings.py
+4. Required me to restart Django console because it was not recognizing new apps
+5. On new expense form, Post does not work - Forbidden (CSRF cookie not set.):
+6. The for attribute of label tag in HTML corresponds to the id of associated field against which this label is to be shown. For example label could be for a text field.
+7. When making an input button, the main advantage of the <button> element is that the <input> element only allows plain text in its label whereas the <button> element allows full HTML content, allowing more complex, creative button content.
+
+2/11
+1. When user enters some text in product text input field of new-expense, this should trigger a call to get the products that match the key up.
+
+2/12
+1. Written the Ajax function
+2. In ajax used url: with the name of url expenses:filter_products instead of path. This includes app name from urls.py for better namespace resolution
+3. {% csrf_token %} is to be added to post method
+
+2/13
+1. Submitted the new expense form
+
+2/14
+1. From new expense form : based return of product is bad. how can I return an id to the view?
+2. The new expense form reloads when there is an error. How can i prevent reload and let the bad values stay on form?
+3. The Cancel button on new expense form needs to be decorated to show like a button
+4. The new expense reset should clear all values and then set the default date
