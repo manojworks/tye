@@ -1,10 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>List of Recent Expenses</title>
-</head>
-<body>
-    <h>List of Recent Expenses</h>
-</body>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <script>
+            $(document).ready(function (){
+                const expense_data = JSON.parse("{{expenses_json|escapejs}}");
+                const tbdy = document.getElementById('expense_tbl').getElementsByTagName('tbody')[0];
+                for (const key in expense_data) {
+                    let val = expense_data[key];
+                    const new_row = tbdy.insertRow(-1);
+                    new_row.innerHTML = "<td>" + val[1] + "</td><td>" + val[2] + "</td><td>" + val[3] + "</td>";
+                }
+            })
+
+
+        </script>
+
+    </head>
+
+
+    <body>
+        <title>{{ page_title }}</title>
+        <h1>{{ page_title }}</h1>
+        <table id="expense_tbl">
+            <thead>
+                <tr>
+                    <th>Date of Purchase</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </body>
+
 </html>

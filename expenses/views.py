@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponseRedirect
+from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
 
 import json
@@ -81,4 +82,15 @@ def filter_products(request):
 
 
 def recent_expenses(request):
-    return render(request, 'expenses/recent-expenses.html')
+    list_of_expenses = list(Expense.objects.values_list('id', 'date_of_purchase', 'product_id__product_description',
+                                                        'purchase_price'))
+    dict_of_expenses = {val[0]: val for val in list_of_expenses}
+    print(dict_of_expenses)
+    expenses_json = json.dumps(dict_of_expenses, cls=DjangoJSONEncoder)
+
+    context = {
+        'expenses_json': expenses_json,
+        'page_title': f'List of Recent Expenses'
+    }
+
+    return render(request, 'expenses/recent-expenses.html', context)
