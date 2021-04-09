@@ -33,6 +33,7 @@ def new_expense(request):
             return render(request, 'expenses/new-expense.html', {'error_message': error_message})
 
         # we now have a valid product with its id
+        # TODO: Purchase date cannot be in future
         purchase_date_str = request.POST.get('purchase-date', None)
         if purchase_date_str is None:
             error_message = "Invalid Product Purchase Date: " + purchase_date_str
