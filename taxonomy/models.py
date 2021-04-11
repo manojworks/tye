@@ -10,6 +10,12 @@ class Taxonomy(models.Model):
     parent_id = models.ForeignKey('self', on_delete=models.PROTECT, null=True)
     product_description = models.CharField(max_length=200, null=False)
 
+    def parent_description(self):
+        if self.parent_id is not None:
+            return self.parent_id.product_description
+        else:
+            return self.product_description
+
     def __str__(self):
         if self.parent_id is None:
             return f"<Product ID: {self.taxonomy_id} , Parent: None, Product Description: {self.product_description}>"
