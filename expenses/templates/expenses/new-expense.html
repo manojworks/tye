@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>New Expense</title>
+</head>
+<body onload="form_reset()">
+    {% if error_message %} <p><strong>{{ error_message }}</strong></p>{% endif %}
+    <div class="form-style-basic">
+        <div class="form-style-basic-heading">New Expense</div>
+        <form action="{% url 'expenses:new_expense' %}" id="expense-form" method="post">
+            {% csrf_token %}
+            <label for="search-product"><span>Product<span class="required">*</span></span>
+            <input type="search" class="select-field" list="product-search-results" id="search-product" name="search-product" onkeyup="filter_products()" placeholder="Products..."></label>
+            <datalist id="product-search-results"></datalist>
+            <label for="purchase-date"><span>Date of Purchase<span class="required">*</span></span>
+            <input type="date" class="input-field" id="purchase-date" name="purchase-date" value=""/></label>
+            <label for="purchase-price"><span>Purchase Price<span class="required">*</span></span>
+            <input type="number" class="input-field" id="purchase-price" name="purchase-price", min="0.01", step="0.01", max="9999.99"></label>
+            <label><span> </span><button type="submit" class="form-button" id="submit-expense" name="submit-expense">Submit</button>
+            <button type="reset" class="form-button" id="clear-expense" name="clear-expense" onclick="form_reset()">Clear</button>
+            <a class="form-button" href="recent-expenses">Cancel</a></label>
+        </form>
+    </div>
+</body>
+    <script>
+
+        function form_reset() {
+            document.getElementById('purchase-date').value = new Date().toISOString().split('T')[0];
+        }
+
+        function filter_products() {
+            const search_input = $("#search-product").val();
+            $.ajax({
+                type: 'GET',
+                url: "{% url 'expenses:filter_products' %}",
+                data: {"product_filter": search_input},
+                success: function (response) {
+                    var dl = document.getElementById("product-search-results");
+                    if ($('#product-search-results').length != 0) {
+                        $('#product-search-results').empty();
+                    }
+                    var search_results = $.parseJSON(response);
+                    for (const [prod_desc, prod_id] of Object.entries(search_results)) {
+                        var op = document.createElement("option");
+                        op.value = prod_desc + ":" + prod_id;
+                        dl.appendChild(op);
+                    }
+
+                },
+                error: function (response) {
+                    console.log(response)
+                }
+            })
+        }
+
+    </script>
+</html>
