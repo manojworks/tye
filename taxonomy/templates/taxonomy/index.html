@@ -4,15 +4,31 @@
 <html lang="en">
     <head>
         <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-         <title>{{ page_title }}</title>
+        <link type="text/css" rel="stylesheet" href="{% static 'js/simplePagination.js/simplePagination.css' %}"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="{% static 'js/simplePagination.js/jquery.simplePagination.js' %}"></script>
+        <script src="{% static 'scripts/scripts.js' %}"></script>
+        <title>{{ page_title }}</title>
     </head>
 
+    <body onload="makeTableOnLoad()">
 
-
-    <body>
         <div class="table-section">
+            <input type="hidden" id="numRows" value="-1">
             <div class="table-heading">{{ page_title }}</div>
-            <table id="gen_tbl">
+            <label for="maxRows">Number of rows</label>
+            <select id="maxRows" >
+                 <option value="5">5</option>
+                 <option value="10" selected="selected">10</option>
+                 <option value="15">15</option>
+                 <option value="20">20</option>
+                 <option value="50">50</option>
+                 <option value="70">70</option>
+                 <option value="100">100</option>
+                 <option value="5000">All Rows</option>
+            </select>
+            <div id="pagination"></div>
+            <table id="gen_tbl" class="var-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -20,22 +36,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                <tr></tr>
                 </tbody>
             </table>
+
         </div>
     </body>
-
-     <script>
-        let taxonomy_json = JSON.parse('{{ dict_of_taxonomies | escapejs }}')
-        var tbdy = document.getElementById('gen_tbl').getElementsByTagName('tbody')[0]
-
-        const len = Object.keys(taxonomy_json).length
-        const all_ids = Object.keys(taxonomy_json)
-        for (var i  = 0; i < len; i++) {
-            var pid = all_ids[i]
-            var new_row = tbdy.insertRow(-1)
-            new_row.innerHTML = "<td>" + pid + "</td><td>" + taxonomy_json[pid] + "</td>"
-        }
-    </script>
 
 </html>
