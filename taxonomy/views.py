@@ -1,9 +1,36 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, get_list_or_404, Http404
 from django.views import generic
 import json
 
 from .models import Taxonomy
 
+
+def taxonomy_list_size(request):
+    if request.is_ajax() and request.method == 'GET':
+        sz = Taxonomy.objects.count()
+        return JsonResponse([sz], status=200, safe=False)
+    else:
+        return JsonResponse({}, status=400)
+
+
+def list_taxonomy_in_range(request):
+    if request.is_ajax() and request.method == 'GET':
+        startRow = request.GET.get("startRow", 0)
+        endRow = request.GET.get("endRow", -1)
+        startRow = int(startRow)
+        endRow = int(endRow)
+        if endRow == -1:
+            list_of_taxonomies = Taxonomy.objects.values_list('taxonomy_id', 'product_description').order_by(
+                'taxonomy_id')
+        else:
+            list_of_taxonomies = Taxonomy.objects.values_list('taxonomy_id', 'product_description').order_by(
+                'taxonomy_id')[startRow:endRow]
+
+        tmp_json = json.dumps(dict(list(list_of_taxonomies)))
+        return JsonResponse(tmp_json, status=200, safe=False)
+
+    return JsonResponse({}, status=400)
 
 def list_all(request):
     list_of_taxonomies = Taxonomy.objects.values_list('taxonomy_id', 'product_description').order_by('taxonomy_id')
